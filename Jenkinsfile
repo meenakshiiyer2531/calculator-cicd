@@ -9,16 +9,23 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Setup VirtualEnv') {
             steps {
-                sh 'pip3 install --upgrade pip'
-                sh 'pip3 install -r requirements.txt || true'  // ignore if no requirements.txt
+                sh '''
+                    python3 -m venv venv
+                    . venv/bin/activate
+                    pip install --upgrade pip
+                    if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+                '''
             }
         }
 
         stage('Run Tests') {
             steps {
-                sh 'python3 -m unittest discover -s .'
+                sh '''
+                    . venv/bin/activate
+                    pytest --maxfail=1 --disable-warnings -q
+                '''
             }
         }
     }
