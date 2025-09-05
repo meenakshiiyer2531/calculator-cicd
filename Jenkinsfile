@@ -1,7 +1,5 @@
 pipeline {
-    agent {
-        docker { image 'python:3.10' }  // Use Python Docker image
-    }
+    agent any
 
     stages {
         stage('Checkout') {
@@ -13,13 +11,14 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                sh 'pip install -r requirements.txt'
+                sh 'pip3 install --upgrade pip'
+                sh 'pip3 install -r requirements.txt || true'  // ignore if no requirements.txt
             }
         }
 
         stage('Run Tests') {
             steps {
-                sh 'pytest --maxfail=1 --disable-warnings -q'
+                sh 'python3 -m unittest discover -s .'
             }
         }
     }
